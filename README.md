@@ -20,25 +20,13 @@
 
 ### Архитектура системы
 
-```text
-[ PostgreSQL / MySQL / SQLite ] 
-               │
-               ▼ (SQLAlchemy ORM Inspection)
-┌──────────────────────────────────────────┐
-│        Data Quality Engine (Flask)       │
-│  - DB Inspector (Подсчет COUNT, NULL)    │
-│  - Metrics Calculator (Completeness Score│
-│  - Alerting Engine (Telegram Notifier)   │
-└────────────────────┬─────────────────────┘
-                     │
-        ┌────────────┴────────────┐
-        ▼                         ▼
-┌───────────────┐        ┌──────────────────┐
-│ Web Dashboard │        │  Telegram / API  │
-│ (Chart.js /   │        │   Notification   │
-│  Bootstrap 5) │        │   (/api/v1/scan) │
-└───────────────┘        └──────────────────┘
-
+| Компонент / Уровень | Описание | Основные задачи | Технологии / Стек |
+| :--- | :--- | :--- | :--- |
+| **Источники данных (Data Sources)** | Реляционные базы данных | Предоставление сырых данных для анализа | `PostgreSQL` / `MySQL` / `SQLite` |
+| **Интерфейс подключения** | SQLAlchemy ORM Inspection | Получение метаданных и схем данных | `SQLAlchemy` |
+| **Data Quality Engine** | Ядро системы контроля качества | - Подсчет метрик (`COUNT`, `NULL`) <br> - Расчет показателей (Completeness Score) <br> - Обработка оповещений | `Flask`, `DB Inspector`, `Metrics Calculator`, `Alerting Engine` |
+| **Web Dashboard** | Веб-интерфейс для мониторинга | Визуализация метрик и результатов проверок | `Chart.js`, `Bootstrap 5` |
+| **API / Notification** | Интерфейс оповещений и API | - Отправка уведомлений в Telegram <br> - Сканирование по запросу (`/api/v1/scan`) | `Telegram API` |
 ```
 
 ---
@@ -186,5 +174,3 @@ python generate_report_assets.py
 * **Frontend:** Bootstrap 5, Chart.js, Jinja2
 * **Testing & Quality:** Pytest 8.0
 * **Analytics & Visualization:** Pandas, Seaborn, Matplotlib
-
-```
