@@ -1,5 +1,8 @@
 import os
 import requests
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class TelegramNotifier:
     def __init__(self, token=None, chat_id=None):
@@ -7,10 +10,8 @@ class TelegramNotifier:
         self.chat_id = chat_id or os.getenv("TELEGRAM_CHAT_ID")
 
     def send_alert(self, message: str) -> bool:
-        """Отправка алертов в Telegram."""
         if not self.token or not self.chat_id:
-            print("[Mock Alert]: Telegram не настроен. Сообщение:")
-            print(message)
+            print("[Mock Mode]: TELEGRAM_BOT_TOKEN или TELEGRAM_CHAT_ID не найдены в .env!")
             return False
 
         url = f"https://api.telegram.org/bot{self.token}/sendMessage"
@@ -27,8 +28,8 @@ class TelegramNotifier:
                 print("Уведомление успешно доставлено в Telegram!")
                 return True
             else:
-                print(f"Ошибка отправки Telegram: {data.get('description')}")
+                print(f"Ошибка Telegram API: {data.get('description')} (Код: {response.status_code})")
                 return False
         except Exception as e:
-            print(f"Ошибка соединения с Telegram API: {e}")
+            print(f"Ошибка сети при запросе к Telegram: {e}")
             return False

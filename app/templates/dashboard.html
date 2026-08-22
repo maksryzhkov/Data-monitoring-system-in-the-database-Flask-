@@ -54,46 +54,38 @@
     </div>
 </div>
 
-<script>
-    const tablesData = {{ tables | tojson }};
-    const labels = tablesData.map(t => t.table_name);
-    const dataValues = tablesData.map(t => t.completeness_pct);
-
-    const ctx = document.getElementById('completenessChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Completeness Score (%)',
-                data: dataValues,
-                backgroundColor: dataValues.map(v => v >= 90 ? '#198754' : '#ffc107')
-            }]
-        },
-        options: {
-            scales: { y: { min: 0, max: 100 } }
-        }
-    });
+<script id="tables-data" type="application/json">
+    {{ tables | tojson | safe }}
 </script>
 
-    const ctx = document.getElementById('completenessChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Полнота данных (%)',
-                data: dataValues,
-                backgroundColor: dataValues.map(v => v < 100 ? 'rgba(255, 193, 7, 0.7)' : 'rgba(40, 167, 69, 0.7)'),
-                borderColor: dataValues.map(v => v < 100 ? 'rgba(255, 193, 7, 1)' : 'rgba(40, 167, 69, 1)'),
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: { beginAtZero: true, max: 100 }
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const rawData = document.getElementById('tables-data').textContent;
+        const tablesData = JSON.parse(rawData);
+
+        const labels = tablesData.map(t => t.table_name);
+        const dataValues = tablesData.map(t => t.completeness_pct);
+
+        const ctx = document.getElementById('completenessChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Полнота данных (%)',
+                    data: dataValues,
+                    backgroundColor: dataValues.map(v => v < 90 ? 'rgba(255, 193, 7, 0.7)' : 'rgba(40, 167, 69, 0.7)'),
+                    borderColor: dataValues.map(v => v < 90 ? 'rgba(255, 193, 7, 1)' : 'rgba(40, 167, 69, 1)'),
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true, max: 100 }
+                }
             }
-        }
+        });
     });
 </script>
 {% endblock %}
