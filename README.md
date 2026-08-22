@@ -27,7 +27,6 @@
 | **Data Quality Engine** | Ядро системы контроля качества | - Подсчет метрик (`COUNT`, `NULL`) <br> - Расчет показателей (Completeness Score) <br> - Обработка оповещений | `Flask`, `DB Inspector`, `Metrics Calculator`, `Alerting Engine` |
 | **Web Dashboard** | Веб-интерфейс для мониторинга | Визуализация метрик и результатов проверок | `Chart.js`, `Bootstrap 5` |
 | **API / Notification** | Интерфейс оповещений и API | - Отправка уведомлений в Telegram <br> - Сканирование по запросу (`/api/v1/scan`) | `Telegram API` |
-```
 
 ---
 
