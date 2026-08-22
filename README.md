@@ -188,5 +188,3 @@ python generate_report_assets.py
 * **Analytics & Visualization:** Pandas, Seaborn, Matplotlib
 
 ```
-
-```
