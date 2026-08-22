@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h2 class="fw-bold">Дашборд качества данных</h2>
+        <p class="text-muted">Автоматический анализ таблиц, количества записей и пропущенных значений (NULL).</p>
+    </div>
+</div>
+
+<!-- Сводные карточки -->
+<div class="row mb-4">
+    {% for table in tables %}
+    <div class="col-md-6 mb-3">
+        <div class="card shadow-sm border-{{ 'warning' if table.status == 'WARNING' else 'success' }}">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold">Таблица: {{ table.table_name }}</h5>
+                <span class="badge bg-{{ 'warning text-dark' if table.status == 'WARNING' else 'success' }}">
+                    {{ table.status }}
+                </span>
+            </div>
+            <div class="card-body">
+                <p class="mb-1"><strong>Всего строк:</strong> {{ table.total_rows }}</p>
+                <p class="mb-1"><strong>Количество колонок:</strong> {{ table.columns_count }}</p>
+                <p class="mb-1"><strong>Всего пропусков (NULL):</strong> {{ table.total_nulls }}</p>
+                <p class="mb-3"><strong>Полнота данных:</strong> {{ table.completeness_pct }}%</p>
+
+                {% if table.null_stats %}
+                    <h6 class="fw-bold text-danger">Пропущенные поля:</h6>
+                    <ul class="list-group list-group-flush mb-3">
+                        {% for col, count in table.null_stats.items() %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-1 bg-transparent">
+                            <span>Столбец <code>{{ col }}</code></span>
+                            <span class="badge bg-danger rounded-pill">{{ count }} NULL</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- График визуализации -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title fw-bold">Сравнение полноты данных по таблицам (%)</h5>
+                <canvas id="completenessChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const tablesData = {{ tables | tojson }};
+    const labels = tablesData.map(t => t.table_name);
+    const dataValues = tablesData.map(t => t.completeness_pct);
+
+    const ctx = document.getElementById('completenessChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Completeness Score (%)',
+                data: dataValues,
+                backgroundColor: dataValues.map(v => v >= 90 ? '#198754' : '#ffc107')
+            }]
+        },
+        options: {
+            scales: { y: { min: 0, max: 100 } }
+        }
+    });
+</script>
+
+    const ctx = document.getElementById('completenessChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Полнота данных (%)',
+                data: dataValues,
+                backgroundColor: dataValues.map(v => v < 100 ? 'rgba(255, 193, 7, 0.7)' : 'rgba(40, 167, 69, 0.7)'),
+                borderColor: dataValues.map(v => v < 100 ? 'rgba(255, 193, 7, 1)' : 'rgba(40, 167, 69, 1)'),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: { beginAtZero: true, max: 100 }
+            }
+        }
+    });
+</script>
+{% endblock %}
